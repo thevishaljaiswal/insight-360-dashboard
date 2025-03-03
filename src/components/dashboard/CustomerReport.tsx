@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from 'react';
 import DataTable from '@/components/dashboard/DataTable';
 import { Input } from '@/components/ui/input';
@@ -30,42 +29,34 @@ import {
 import { cn } from '@/lib/utils';
 
 // Define data types for different report types
-type ScheduleData = {
+interface BaseReportData {
   id: string;
   date: string;
+  status: string;
+  amount: number;
+}
+
+interface ScheduleData extends BaseReportData {
   description: string;
-  status: string;
-  amount: number;
-};
+}
 
-type PaymentData = {
-  id: string;
-  date: string;
+interface PaymentData extends BaseReportData {
   method: string;
-  status: string;
-  amount: number;
-};
+}
 
-type InvoiceData = {
-  id: string;
-  date: string;
+interface InvoiceData extends BaseReportData {
   dueDate: string;
-  status: string;
-  amount: number;
-};
+}
 
-type DeviationData = {
-  id: string;
-  date: string;
+interface DeviationData extends BaseReportData {
   requestType: string;
-  status: string;
-  amount: number;
-};
+}
 
+// Union type for all report data
 type ReportData = ScheduleData | PaymentData | InvoiceData | DeviationData;
 
-// Mock data for different report types
-const generateMockData = (type: string, count: number = 15): ScheduleData[] | PaymentData[] | InvoiceData[] | DeviationData[] => {
+// Mock data for different report types - now using a common return type
+const generateMockData = (type: string, count: number = 15): ReportData[] => {
   const today = new Date();
   
   switch (type) {
@@ -273,11 +264,11 @@ export default function CustomerReport({
     
     columnDefinitions.forEach(column => {
       const key = column.accessorKey as string;
-      const firstItem = mockData[0][key];
+      const firstItem = mockData[0][key as keyof ReportData];
       
       // Check if the column contains numeric values
       if (typeof firstItem === 'number') {
-        result[key] = mockData.reduce((sum, item) => sum + (item[key] || 0), 0);
+        result[key] = mockData.reduce((sum, item) => sum + (item[key as keyof ReportData] as number || 0), 0);
       }
     });
     
@@ -292,8 +283,8 @@ export default function CustomerReport({
     
     columnDefinitions.forEach(column => {
       const key = column.accessorKey as string;
-      if (typeof mockData[0][key] === 'string') {
-        const uniqueValues = Array.from(new Set(mockData.map(item => item[key])));
+      if (typeof mockData[0][key as keyof ReportData] === 'string') {
+        const uniqueValues = Array.from(new Set(mockData.map(item => String(item[key as keyof ReportData]))));
         if (uniqueValues.length > 1 && uniqueValues.length < 10) {
           options[key] = uniqueValues;
         }
@@ -320,7 +311,10 @@ export default function CustomerReport({
     // Apply filters
     Object.entries(filters).forEach(([key, values]) => {
       if (values.length > 0) {
-        result = result.filter(item => values.includes(String(item[key])));
+        result = result.filter(item => {
+          const itemValue = String(item[key as keyof ReportData]);
+          return values.includes(itemValue);
+        });
       }
     });
     

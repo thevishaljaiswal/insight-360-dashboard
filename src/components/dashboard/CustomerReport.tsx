@@ -29,8 +29,43 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
+// Define data types for different report types
+type ScheduleData = {
+  id: string;
+  date: string;
+  description: string;
+  status: string;
+  amount: number;
+};
+
+type PaymentData = {
+  id: string;
+  date: string;
+  method: string;
+  status: string;
+  amount: number;
+};
+
+type InvoiceData = {
+  id: string;
+  date: string;
+  dueDate: string;
+  status: string;
+  amount: number;
+};
+
+type DeviationData = {
+  id: string;
+  date: string;
+  requestType: string;
+  status: string;
+  amount: number;
+};
+
+type ReportData = ScheduleData | PaymentData | InvoiceData | DeviationData;
+
 // Mock data for different report types
-const generateMockData = (type: string, count: number = 15) => {
+const generateMockData = (type: string, count: number = 15): ScheduleData[] | PaymentData[] | InvoiceData[] | DeviationData[] => {
   const today = new Date();
   
   switch (type) {
@@ -41,7 +76,7 @@ const generateMockData = (type: string, count: number = 15) => {
         description: `Payment Schedule ${i + 1}`,
         status: ['Upcoming', 'Completed', 'Pending'][Math.floor(Math.random() * 3)],
         amount: Math.floor(Math.random() * 10000) / 100,
-      }));
+      })) as ScheduleData[];
       
     case 'payments':
       return Array.from({ length: count }, (_, i) => ({
@@ -50,7 +85,7 @@ const generateMockData = (type: string, count: number = 15) => {
         method: ['Credit Card', 'Bank Transfer', 'Cash', 'Check'][Math.floor(Math.random() * 4)],
         status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
         amount: Math.floor(Math.random() * 100000) / 100,
-      }));
+      })) as PaymentData[];
       
     case 'invoices':
       return Array.from({ length: count }, (_, i) => ({
@@ -59,7 +94,7 @@ const generateMockData = (type: string, count: number = 15) => {
         dueDate: new Date(today.getFullYear(), today.getMonth() - Math.floor(i/3) + 1, today.getDate() - (i % 28)).toISOString().split('T')[0],
         status: ['Paid', 'Unpaid', 'Overdue'][Math.floor(Math.random() * 3)],
         amount: Math.floor(Math.random() * 200000) / 100,
-      }));
+      })) as InvoiceData[];
       
     case 'deviations':
       return Array.from({ length: count }, (_, i) => ({
@@ -68,7 +103,7 @@ const generateMockData = (type: string, count: number = 15) => {
         requestType: ['Payment Extension', 'Fee Waiver', 'Rate Change', 'Restructure'][Math.floor(Math.random() * 4)],
         status: ['Approved', 'Pending', 'Rejected'][Math.floor(Math.random() * 3)],
         amount: Math.floor(Math.random() * 50000) / 100,
-      }));
+      })) as DeviationData[];
       
     default:
       return [];
@@ -203,28 +238,6 @@ const getColumnDefinitions = (type: string) => {
   }
 };
 
-// Custom Badge component with variants
-type VariantType = 'default' | 'success' | 'warning' | 'destructive' | 'outline';
-
-const Badge = ({ children, variant = 'default' }: { children: React.ReactNode, variant?: VariantType }) => {
-  return (
-    <span 
-      className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-        {
-          'bg-primary text-primary-foreground': variant === 'default',
-          'bg-emerald-100 text-emerald-700': variant === 'success',
-          'bg-amber-100 text-amber-700': variant === 'warning',
-          'bg-destructive/15 text-destructive': variant === 'destructive',
-          'bg-secondary text-secondary-foreground': variant === 'outline',
-        }
-      )}
-    >
-      {children}
-    </span>
-  );
-};
-
 type FilterState = {
   [key: string]: string[];
 };
@@ -274,6 +287,8 @@ export default function CustomerReport({
   // Determine available filter options
   const filterOptions = useMemo(() => {
     const options: Record<string, string[]> = {};
+    
+    if (mockData.length === 0) return options;
     
     columnDefinitions.forEach(column => {
       const key = column.accessorKey as string;

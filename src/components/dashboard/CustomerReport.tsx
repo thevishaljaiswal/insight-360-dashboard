@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import DataTable from '@/components/dashboard/DataTable';
 import { Input } from '@/components/ui/input';
@@ -28,216 +29,18 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-// Define data types for different report types
-interface BaseReportData {
-  id: string;
-  date: string;
-  status: string;
-  amount: number;
-}
+// Import types
+import { FilterState, CustomerReportProps, ReportData } from '@/types/reportTypes';
 
-interface ScheduleData extends BaseReportData {
-  description: string;
-}
-
-interface PaymentData extends BaseReportData {
-  method: string;
-}
-
-interface InvoiceData extends BaseReportData {
-  dueDate: string;
-}
-
-interface DeviationData extends BaseReportData {
-  requestType: string;
-}
-
-// Union type for all report data
-type ReportData = ScheduleData | PaymentData | InvoiceData | DeviationData;
-
-// Mock data for different report types - now using a common return type
-const generateMockData = (type: string, count: number = 15): ReportData[] => {
-  const today = new Date();
-  
-  switch (type) {
-    case 'schedules':
-      return Array.from({ length: count }, (_, i) => ({
-        id: `SCH-${(1000 + i).toString()}`,
-        date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + i * 3).toISOString().split('T')[0],
-        description: `Payment Schedule ${i + 1}`,
-        status: ['Upcoming', 'Completed', 'Pending'][Math.floor(Math.random() * 3)],
-        amount: Math.floor(Math.random() * 10000) / 100,
-      })) as ScheduleData[];
-      
-    case 'payments':
-      return Array.from({ length: count }, (_, i) => ({
-        id: `PAY-${(2000 + i).toString()}`,
-        date: new Date(today.getFullYear(), today.getMonth(), today.getDate() - i * 5).toISOString().split('T')[0],
-        method: ['Credit Card', 'Bank Transfer', 'Cash', 'Check'][Math.floor(Math.random() * 4)],
-        status: ['Completed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-        amount: Math.floor(Math.random() * 100000) / 100,
-      })) as PaymentData[];
-      
-    case 'invoices':
-      return Array.from({ length: count }, (_, i) => ({
-        id: `INV-${(3000 + i).toString()}`,
-        date: new Date(today.getFullYear(), today.getMonth() - Math.floor(i/3), today.getDate() - (i % 28)).toISOString().split('T')[0],
-        dueDate: new Date(today.getFullYear(), today.getMonth() - Math.floor(i/3) + 1, today.getDate() - (i % 28)).toISOString().split('T')[0],
-        status: ['Paid', 'Unpaid', 'Overdue'][Math.floor(Math.random() * 3)],
-        amount: Math.floor(Math.random() * 200000) / 100,
-      })) as InvoiceData[];
-      
-    case 'deviations':
-      return Array.from({ length: count }, (_, i) => ({
-        id: `DEV-${(4000 + i).toString()}`,
-        date: new Date(today.getFullYear(), today.getMonth(), today.getDate() - i * 7).toISOString().split('T')[0],
-        requestType: ['Payment Extension', 'Fee Waiver', 'Rate Change', 'Restructure'][Math.floor(Math.random() * 4)],
-        status: ['Approved', 'Pending', 'Rejected'][Math.floor(Math.random() * 3)],
-        amount: Math.floor(Math.random() * 50000) / 100,
-      })) as DeviationData[];
-      
-    default:
-      return [];
-  }
-};
-
-// Column definitions for different report types
-const getColumnDefinitions = (type: string) => {
-  switch (type) {
-    case 'schedules':
-      return [
-        { header: 'Schedule ID', accessorKey: 'id' },
-        { header: 'Schedule Date', accessorKey: 'date' },
-        { header: 'Description', accessorKey: 'description' },
-        { 
-          header: 'Status', 
-          accessorKey: 'status',
-          cell: (item: any) => (
-            <Badge 
-              variant={
-                item.status === 'Completed' ? 'success' : 
-                item.status === 'Upcoming' ? 'outline' : 'warning'
-              }
-            >
-              {item.status}
-            </Badge>
-          )
-        },
-        { 
-          header: 'Amount', 
-          accessorKey: 'amount',
-          cell: (item: any) => (
-            <span className="font-mono">
-              ${item.amount.toFixed(2)}
-            </span>
-          )
-        },
-      ];
-      
-    case 'payments':
-      return [
-        { header: 'Payment ID', accessorKey: 'id' },
-        { header: 'Payment Date', accessorKey: 'date' },
-        { header: 'Payment Method', accessorKey: 'method' },
-        { 
-          header: 'Status', 
-          accessorKey: 'status',
-          cell: (item: any) => (
-            <Badge 
-              variant={
-                item.status === 'Completed' ? 'success' : 
-                item.status === 'Pending' ? 'outline' : 'destructive'
-              }
-            >
-              {item.status}
-            </Badge>
-          )
-        },
-        { 
-          header: 'Amount', 
-          accessorKey: 'amount',
-          cell: (item: any) => (
-            <span className="font-mono">
-              ${item.amount.toFixed(2)}
-            </span>
-          )
-        },
-      ];
-      
-    case 'invoices':
-      return [
-        { header: 'Invoice ID', accessorKey: 'id' },
-        { header: 'Issue Date', accessorKey: 'date' },
-        { header: 'Due Date', accessorKey: 'dueDate' },
-        { 
-          header: 'Status', 
-          accessorKey: 'status',
-          cell: (item: any) => (
-            <Badge 
-              variant={
-                item.status === 'Paid' ? 'success' : 
-                item.status === 'Unpaid' ? 'outline' : 'destructive'
-              }
-            >
-              {item.status}
-            </Badge>
-          )
-        },
-        { 
-          header: 'Amount', 
-          accessorKey: 'amount',
-          cell: (item: any) => (
-            <span className="font-mono">
-              ${item.amount.toFixed(2)}
-            </span>
-          )
-        },
-      ];
-      
-    case 'deviations':
-      return [
-        { header: 'Deviation ID', accessorKey: 'id' },
-        { header: 'Request Date', accessorKey: 'date' },
-        { header: 'Request Type', accessorKey: 'requestType' },
-        { 
-          header: 'Status', 
-          accessorKey: 'status',
-          cell: (item: any) => (
-            <Badge 
-              variant={
-                item.status === 'Approved' ? 'success' : 
-                item.status === 'Pending' ? 'outline' : 'destructive'
-              }
-            >
-              {item.status}
-            </Badge>
-          )
-        },
-        { 
-          header: 'Amount', 
-          accessorKey: 'amount',
-          cell: (item: any) => (
-            <span className="font-mono">
-              ${item.amount.toFixed(2)}
-            </span>
-          )
-        },
-      ];
-      
-    default:
-      return [];
-  }
-};
-
-type FilterState = {
-  [key: string]: string[];
-};
-
-interface CustomerReportProps {
-  customerId: string;
-  reportType: string;
-  title: string;
-}
+// Import utilities
+import { generateMockData } from '@/utils/reportMockData';
+import { getColumnDefinitions, ColumnDef } from '@/utils/reportColumns';
+import { 
+  formatCurrency, 
+  calculateTotals, 
+  getFilterOptions, 
+  applyFilters 
+} from '@/utils/reportUtils';
 
 export default function CustomerReport({ 
   customerId, 
@@ -257,69 +60,22 @@ export default function CustomerReport({
   });
   
   // Calculate total for numeric columns
-  const totals = useMemo(() => {
-    if (!mockData.length) return {};
-    
-    const result: Record<string, number> = {};
-    
-    columnDefinitions.forEach(column => {
-      const key = column.accessorKey as string;
-      const firstItem = mockData[0][key as keyof ReportData];
-      
-      // Check if the column contains numeric values
-      if (typeof firstItem === 'number') {
-        result[key] = mockData.reduce((sum, item) => sum + (item[key as keyof ReportData] as number || 0), 0);
-      }
-    });
-    
-    return result;
-  }, [mockData, columnDefinitions]);
+  const totals = useMemo(() => 
+    calculateTotals(mockData, columnDefinitions), 
+    [mockData, columnDefinitions]
+  );
   
   // Determine available filter options
-  const filterOptions = useMemo(() => {
-    const options: Record<string, string[]> = {};
-    
-    if (mockData.length === 0) return options;
-    
-    columnDefinitions.forEach(column => {
-      const key = column.accessorKey as string;
-      if (typeof mockData[0][key as keyof ReportData] === 'string') {
-        const uniqueValues = Array.from(new Set(mockData.map(item => String(item[key as keyof ReportData]))));
-        if (uniqueValues.length > 1 && uniqueValues.length < 10) {
-          options[key] = uniqueValues;
-        }
-      }
-    });
-    
-    return options;
-  }, [mockData, columnDefinitions]);
+  const filterOptions = useMemo(() => 
+    getFilterOptions(mockData, columnDefinitions), 
+    [mockData, columnDefinitions]
+  );
   
   // Apply filters to the data
-  const filteredData = useMemo(() => {
-    let result = mockData;
-    
-    // Apply text search
-    if (search) {
-      const searchLower = search.toLowerCase();
-      result = result.filter(item => 
-        Object.values(item).some(
-          value => String(value).toLowerCase().includes(searchLower)
-        )
-      );
-    }
-    
-    // Apply filters
-    Object.entries(filters).forEach(([key, values]) => {
-      if (values.length > 0) {
-        result = result.filter(item => {
-          const itemValue = String(item[key as keyof ReportData]);
-          return values.includes(itemValue);
-        });
-      }
-    });
-    
-    return result;
-  }, [mockData, search, filters]);
+  const filteredData = useMemo(() => 
+    applyFilters(mockData, search, filters), 
+    [mockData, search, filters]
+  );
   
   // Filter columns based on visibility
   const visibleColumnDefs = useMemo(() => {
@@ -362,14 +118,6 @@ export default function CustomerReport({
   const clearFilters = () => {
     setFilters({});
     setSearch('');
-  };
-  
-  // Format number as currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(value);
   };
   
   return (

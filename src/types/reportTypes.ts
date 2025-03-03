@@ -23,6 +23,23 @@ export interface DeviationData extends BaseReportData {
   requestType: string;
 }
 
+// Activity data type for the activity tab
+export interface ActivityData {
+  id: number;
+  date: string;
+  event: string;
+  status: 'completed' | 'upcoming' | 'resolved' | 'pending';
+  description: string;
+}
+
+// Document data type for the documents tab
+export interface DocumentData {
+  name: string;
+  type: string;
+  size: string;
+  date: string;
+}
+
 // Union type for all report data
 export type ReportData = ScheduleData | PaymentData | InvoiceData | DeviationData;
 

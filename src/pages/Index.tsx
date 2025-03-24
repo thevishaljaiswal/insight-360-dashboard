@@ -5,6 +5,7 @@ import RoleSelector from '@/components/dashboard/RoleSelector';
 import TeamMemberSelector from '@/components/dashboard/TeamMemberSelector';
 import CustomerSearch from '@/components/dashboard/CustomerSearch';
 import CustomerList from '@/components/dashboard/CustomerList';
+import CustomerImportantDates from '@/components/dashboard/CustomerImportantDates';
 import { useUser } from '@/contexts/UserContext';
 import RoleBasedView from '@/components/ui/RoleBasedView';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -120,15 +121,22 @@ export default function Index() {
                   />
                 </div>
 
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Find Customer</h2>
-                  <CustomerSearch onSearch={handleSearch} />
-                  {searchQuery && (
-                    <div className="animate-fade-in">
-                      <h3 className="text-lg font-medium mb-4">Search Results</h3>
-                      <CustomerList searchQuery={searchQuery} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <div className="space-y-6">
+                      <h2 className="text-xl font-semibold">Find Customer</h2>
+                      <CustomerSearch onSearch={handleSearch} />
+                      {searchQuery && (
+                        <div className="animate-fade-in">
+                          <h3 className="text-lg font-medium mb-4">Search Results</h3>
+                          <CustomerList searchQuery={searchQuery} />
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                  <div className="md:col-span-1">
+                    <CustomerImportantDates />
+                  </div>
                 </div>
               </>
             ) : (
@@ -179,15 +187,22 @@ export default function Index() {
                   />
                 </div>
 
-                <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Find Customer</h2>
-                  <CustomerSearch onSearch={handleSearch} />
-                  {searchQuery && (
-                    <div className="animate-fade-in">
-                      <h3 className="text-lg font-medium mb-4">Search Results</h3>
-                      <CustomerList searchQuery={searchQuery} />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
+                    <div className="space-y-6">
+                      <h2 className="text-xl font-semibold">Find Customer</h2>
+                      <CustomerSearch onSearch={handleSearch} />
+                      {searchQuery && (
+                        <div className="animate-fade-in">
+                          <h3 className="text-lg font-medium mb-4">Search Results</h3>
+                          <CustomerList searchQuery={searchQuery} />
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                  <div className="md:col-span-1">
+                    <CustomerImportantDates />
+                  </div>
                 </div>
               </>
             ) : (
@@ -236,15 +251,22 @@ export default function Index() {
               />
             </div>
 
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold">Find Customer</h2>
-              <CustomerSearch onSearch={handleSearch} />
-              {searchQuery && (
-                <div className="animate-fade-in">
-                  <h3 className="text-lg font-medium mb-4">Search Results</h3>
-                  <CustomerList searchQuery={searchQuery} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <div className="space-y-6">
+                  <h2 className="text-xl font-semibold">Find Customer</h2>
+                  <CustomerSearch onSearch={handleSearch} />
+                  {searchQuery && (
+                    <div className="animate-fade-in">
+                      <h3 className="text-lg font-medium mb-4">Search Results</h3>
+                      <CustomerList searchQuery={searchQuery} />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+              <div className="md:col-span-1">
+                <CustomerImportantDates />
+              </div>
             </div>
           </div>
         </RoleBasedView>

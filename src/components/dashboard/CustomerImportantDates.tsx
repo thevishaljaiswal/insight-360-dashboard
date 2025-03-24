@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Calendar, Cake, Gift } from 'lucide-react';
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow, TableHead, TableHeader } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -62,95 +62,103 @@ export default function CustomerImportantDates() {
     return () => clearTimeout(timer);
   }, []);
   
-  const getIcon = (type: DateItem['type']) => {
-    switch (type) {
-      case 'birthday':
-        return <Cake className="h-4 w-4 text-blue-500" />;
-      case 'childBirthday':
-        return <Cake className="h-4 w-4 text-purple-500" />;
-      case 'anniversary':
-        return <Gift className="h-4 w-4 text-pink-500" />;
-      default:
-        return <Calendar className="h-4 w-4" />;
-    }
-  };
-  
-  const getTypeLabel = (type: DateItem['type']) => {
-    switch (type) {
-      case 'birthday':
-        return 'Birthday';
-      case 'childBirthday':
-        return 'Child Birthday';
-      case 'anniversary':
-        return 'Anniversary';
-      default:
-        return 'Event';
-    }
-  };
-  
-  const getRowColor = (daysUntil: number) => {
-    if (daysUntil <= 7) return "bg-red-50";
-    if (daysUntil <= 30) return "bg-yellow-50";
-    return "";
-  };
-  
+  // Filter dates by type and for today only
+  const birthdaysToday = dates.filter(date => date.type === 'birthday' && date.daysUntil === 0);
+  const childrenBirthdaysToday = dates.filter(date => date.type === 'childBirthday' && date.daysUntil === 0);
+  const anniversariesToday = dates.filter(date => date.type === 'anniversary' && date.daysUntil === 0);
+
   return (
-    <Card className={cn("overflow-hidden", isLoaded ? "animate-fade-in" : "opacity-0")}>
-      <CardHeader className="pb-3">
+    <div className="grid grid-cols-1 gap-6 animate-fade-in">
+      {/* Customer Birthdays Today */}
+      <DateTable 
+        title="Today's Customer Birthdays"
+        icon={<Cake className="h-5 w-5 text-blue-500" />}
+        dates={birthdaysToday}
+        emptyMessage="No customer birthdays today"
+        bgColor="bg-blue-50"
+        textColor="text-blue-700"
+      />
+
+      {/* Children Birthdays Today */}
+      <DateTable 
+        title="Today's Children Birthdays"
+        icon={<Cake className="h-5 w-5 text-purple-500" />}
+        dates={childrenBirthdaysToday}
+        emptyMessage="No children birthdays today"
+        bgColor="bg-purple-50"
+        textColor="text-purple-700"
+      />
+
+      {/* Anniversaries Today */}
+      <DateTable 
+        title="Today's Anniversaries"
+        icon={<Gift className="h-5 w-5 text-pink-500" />}
+        dates={anniversariesToday}
+        emptyMessage="No anniversaries today"
+        bgColor="bg-pink-50"
+        textColor="text-pink-700"
+      />
+    </div>
+  );
+}
+
+// Reusable table component for each date type
+function DateTable({ 
+  title, 
+  icon, 
+  dates, 
+  emptyMessage,
+  bgColor,
+  textColor
+}: { 
+  title: string; 
+  icon: React.ReactNode; 
+  dates: DateItem[];
+  emptyMessage: string;
+  bgColor: string;
+  textColor: string;
+}) {
+  return (
+    <Card className={cn("overflow-hidden hover-scale transition-all", bgColor)}>
+      <CardHeader className={`pb-3 ${textColor}`}>
         <CardTitle className="text-md font-medium flex items-center">
-          <Calendar className="mr-2 h-5 w-5" />
-          Upcoming Important Dates
+          {icon}
+          <span className="ml-2">{title}</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="max-h-60 overflow-auto">
-          <Table>
-            <TableBody>
-              {dates.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground py-6">
-                    No upcoming dates
-                  </TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[60%]">Name</TableHead>
+              <TableHead>Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dates.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={2} className="text-center text-muted-foreground py-6">
+                  {emptyMessage}
+                </TableCell>
+              </TableRow>
+            ) : (
+              dates.map((item, index) => (
+                <TableRow 
+                  key={item.id}
+                  className={cn(
+                    "animate-fade-in",
+                    { "animate-delay-100": index % 3 === 0 },
+                    { "animate-delay-200": index % 3 === 1 },
+                    { "animate-delay-300": index % 3 === 2 }
+                  )}
+                >
+                  <TableCell className="py-2 font-medium">{item.name}</TableCell>
+                  <TableCell className="py-2">{item.date}</TableCell>
                 </TableRow>
-              ) : (
-                dates.map((item, index) => (
-                  <TableRow 
-                    key={item.id} 
-                    className={cn(
-                      "hover-scale transition-all",
-                      getRowColor(item.daysUntil),
-                      "animate-fade-in",
-                      { "animate-delay-100": index % 3 === 0 },
-                      { "animate-delay-200": index % 3 === 1 },
-                      { "animate-delay-300": index % 3 === 2 }
-                    )}
-                  >
-                    <TableCell className="py-2">
-                      <div className="flex items-center">
-                        {getIcon(item.type)}
-                        <span className="ml-2 font-medium">{item.name}</span>
-                      </div>
-                      <div className="text-xs text-muted-foreground ml-6">
-                        {getTypeLabel(item.type)}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-2">{item.date}</TableCell>
-                    <TableCell className="py-2 text-right">
-                      <span className={cn(
-                        "px-2 py-1 rounded-full text-xs font-medium",
-                        daysUntilColor(item.daysUntil)
-                      )}>
-                        {item.daysUntil === 0 ? 'Today!' : 
-                         item.daysUntil === 1 ? 'Tomorrow!' : 
-                         `In ${item.daysUntil} days`}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   );

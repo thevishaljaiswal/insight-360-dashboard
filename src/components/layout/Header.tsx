@@ -1,6 +1,6 @@
 
 import { useUser, UserRole } from '@/contexts/UserContext';
-import { Bell, ChevronDown } from 'lucide-react';
+import { Bell, ChevronDown, Users, UserCog, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -14,10 +14,10 @@ import {
 export default function Header() {
   const { role, setRole } = useUser();
   
-  const roleOptions: { value: UserRole; label: string }[] = [
-    { value: 'relationship_manager', label: 'Relationship Manager' },
-    { value: 'team_lead', label: 'Team Lead' },
-    { value: 'head_of_department', label: 'Head of Department' },
+  const roleOptions: { value: UserRole; label: string; icon: React.ElementType }[] = [
+    { value: 'relationship_manager', label: 'Relationship Manager', icon: Users },
+    { value: 'team_lead', label: 'Team Lead', icon: UserCog },
+    { value: 'head_of_department', label: 'Head of Department', icon: BarChart3 },
   ];
 
   return (
@@ -30,7 +30,7 @@ export default function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-secondary transition-all">
             <span className={cn(
-              "text-sm",
+              "text-sm font-medium",
               role === 'relationship_manager' && "text-blue-600",
               role === 'team_lead' && "text-purple-600",
               role === 'head_of_department' && "text-emerald-600"
@@ -42,18 +42,28 @@ export default function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Switch Role</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {roleOptions.map((option) => (
-              <DropdownMenuItem 
-                key={option.value}
-                onClick={() => setRole(option.value)}
-                className={cn(
-                  "cursor-pointer",
-                  role === option.value && "bg-secondary"
-                )}
-              >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
+            {roleOptions.map((option) => {
+              const Icon = option.icon;
+              return (
+                <DropdownMenuItem 
+                  key={option.value}
+                  onClick={() => setRole(option.value)}
+                  className={cn(
+                    "cursor-pointer",
+                    role === option.value && "bg-secondary"
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon size={16} className={cn(
+                      option.value === 'relationship_manager' && "text-blue-600",
+                      option.value === 'team_lead' && "text-purple-600",
+                      option.value === 'head_of_department' && "text-emerald-600"
+                    )} />
+                    <span>{option.label}</span>
+                  </div>
+                </DropdownMenuItem>
+              );
+            })}
           </DropdownMenuContent>
         </DropdownMenu>
         

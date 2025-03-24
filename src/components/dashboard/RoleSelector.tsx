@@ -2,6 +2,13 @@
 import { useUser, UserRole } from '@/contexts/UserContext';
 import { Users, UserCog, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const RoleCard = ({ 
   role, 
@@ -69,7 +76,28 @@ export default function RoleSelector() {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-6">Select Dashboard View</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      {/* Role selection dropdown for smaller screens */}
+      <div className="mb-6 md:hidden">
+        <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a role" />
+          </SelectTrigger>
+          <SelectContent>
+            {roles.map((roleItem) => (
+              <SelectItem key={roleItem.role} value={roleItem.role}>
+                <div className="flex items-center gap-2">
+                  <roleItem.icon className="h-4 w-4" />
+                  <span>{roleItem.title}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      {/* Card view for larger screens */}
+      <div className="hidden md:grid grid-cols-3 gap-6">
         {roles.map((roleItem) => (
           <RoleCard
             key={roleItem.role}

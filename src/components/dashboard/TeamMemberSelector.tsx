@@ -19,9 +19,9 @@ const relationshipManagers = [
 ];
 
 const teamLeads = [
-  { id: 'tl1', name: 'Emily Davis', role: 'team_lead' as UserRole },
-  { id: 'tl2', name: 'Frank Miller', role: 'team_lead' as UserRole },
-  { id: 'tl3', name: 'Grace Taylor', role: 'team_lead' as UserRole },
+  { id: 'tl1', name: 'Emily Davis', role: 'team_lead' as UserRole, members: ['rm1', 'rm2'] },
+  { id: 'tl2', name: 'Frank Miller', role: 'team_lead' as UserRole, members: ['rm3'] },
+  { id: 'tl3', name: 'Grace Taylor', role: 'team_lead' as UserRole, members: ['rm4'] },
 ];
 
 export default function TeamMemberSelector() {

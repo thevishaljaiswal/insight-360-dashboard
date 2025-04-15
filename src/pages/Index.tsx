@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -7,10 +6,12 @@ import TeamMemberSelector from '@/components/dashboard/TeamMemberSelector';
 import CustomerSearch from '@/components/dashboard/CustomerSearch';
 import CustomerList from '@/components/dashboard/CustomerList';
 import CustomerImportantDates from '@/components/dashboard/CustomerImportantDates';
+import TodoCard from '@/components/dashboard/TodoCard';
 import { useUser, UserRole } from '@/contexts/UserContext';
 import RoleBasedView from '@/components/ui/RoleBasedView';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowUp, ArrowDown, Users, AlertCircle, CheckCircle, UserCog } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowUp, ArrowDown, Users, AlertCircle, CheckCircle, UserCog, ClipboardList } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function Index() {
@@ -19,15 +20,12 @@ export default function Index() {
   const navigate = useNavigate();
   const [teamMemberData, setTeamMemberData] = useState<any>(null);
 
-  // Effect to set team member data based on selection
   useEffect(() => {
     if (!selectedTeamMemberId) {
       setTeamMemberData(null);
       return;
     }
 
-    // This would be an API call in a real application
-    // For now, we'll just simulate different data for different selections
     const data = {
       relationship_manager: {
         rm1: {
@@ -135,7 +133,6 @@ export default function Index() {
     </Card>
   );
 
-  // Helper function to get relationship managers for a team lead
   const getRelationshipManagersForTeamLead = (teamLeadId: string) => {
     const teamLead = [
       { id: 'tl1', members: ['rm1', 'rm2'] },
@@ -164,7 +161,6 @@ export default function Index() {
           </div>
         )}
         
-        {/* Relationship Manager Dashboard */}
         <RoleBasedView roles={['relationship_manager']} exact>
           <div className="space-y-6">
             {selectedTeamMemberId && teamMemberData ? (
@@ -216,8 +212,19 @@ export default function Index() {
                       )}
                     </div>
                   </div>
-                  <div className="md:col-span-1">
+                  <div className="md:col-span-1 space-y-6">
+                    <TodoCard />
                     <CustomerImportantDates />
+                    <div className="mt-4">
+                      <Button 
+                        className="w-full" 
+                        variant="outline"
+                        onClick={() => navigate('/tasks')}
+                      >
+                        <ClipboardList className="mr-2 h-4 w-4" />
+                        View All Tasks Report
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </>
@@ -231,7 +238,6 @@ export default function Index() {
           </div>
         </RoleBasedView>
         
-        {/* Team Lead Dashboard */}
         <RoleBasedView roles={['team_lead']} exact>
           <div className="space-y-6">
             {selectedTeamMemberId && teamMemberData ? (
@@ -270,7 +276,6 @@ export default function Index() {
                   />
                 </div>
 
-                {/* Team Members Overview */}
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">Relationship Managers</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -320,8 +325,19 @@ export default function Index() {
                       )}
                     </div>
                   </div>
-                  <div className="md:col-span-1">
+                  <div className="md:col-span-1 space-y-6">
+                    <TodoCard />
                     <CustomerImportantDates />
+                    <div className="mt-4">
+                      <Button 
+                        className="w-full" 
+                        variant="outline"
+                        onClick={() => navigate('/tasks')}
+                      >
+                        <ClipboardList className="mr-2 h-4 w-4" />
+                        View All Tasks Report
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </>
@@ -335,7 +351,6 @@ export default function Index() {
           </div>
         </RoleBasedView>
         
-        {/* Head of Department Dashboard */}
         <RoleBasedView roles={['head_of_department']} exact>
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -372,7 +387,6 @@ export default function Index() {
               />
             </div>
 
-            {/* Team Lead Overview */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Team Leads</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -426,8 +440,19 @@ export default function Index() {
                   )}
                 </div>
               </div>
-              <div className="md:col-span-1">
+              <div className="md:col-span-1 space-y-6">
+                <TodoCard />
                 <CustomerImportantDates />
+                <div className="mt-4">
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => navigate('/tasks')}
+                  >
+                    <ClipboardList className="mr-2 h-4 w-4" />
+                    View All Tasks Report
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

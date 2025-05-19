@@ -7,6 +7,7 @@ import CustomerSearch from '@/components/dashboard/CustomerSearch';
 import CustomerList from '@/components/dashboard/CustomerList';
 import CustomerImportantDates from '@/components/dashboard/CustomerImportantDates';
 import TodoCard from '@/components/dashboard/TodoCard';
+import ReportsSection from '@/components/dashboard/ReportsSection';
 import { useUser, UserRole } from '@/contexts/UserContext';
 import RoleBasedView from '@/components/ui/RoleBasedView';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -161,6 +162,11 @@ export default function Index() {
           </div>
         )}
         
+        {/* Reports Section - For all roles */}
+        <section>
+          <ReportsSection />
+        </section>
+        
         <RoleBasedView roles={['relationship_manager']} exact>
           <div className="space-y-6">
             {selectedTeamMemberId && teamMemberData ? (
@@ -215,16 +221,6 @@ export default function Index() {
                   <div className="md:col-span-1 space-y-6">
                     <TodoCard />
                     <CustomerImportantDates />
-                    <div className="mt-4">
-                      <Button 
-                        className="w-full" 
-                        variant="outline"
-                        onClick={() => navigate('/tasks')}
-                      >
-                        <ClipboardList className="mr-2 h-4 w-4" />
-                        View All Tasks Report
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </>
@@ -328,16 +324,6 @@ export default function Index() {
                   <div className="md:col-span-1 space-y-6">
                     <TodoCard />
                     <CustomerImportantDates />
-                    <div className="mt-4">
-                      <Button 
-                        className="w-full" 
-                        variant="outline"
-                        onClick={() => navigate('/tasks')}
-                      >
-                        <ClipboardList className="mr-2 h-4 w-4" />
-                        View All Tasks Report
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </>
@@ -443,16 +429,6 @@ export default function Index() {
               <div className="md:col-span-1 space-y-6">
                 <TodoCard />
                 <CustomerImportantDates />
-                <div className="mt-4">
-                  <Button 
-                    className="w-full" 
-                    variant="outline"
-                    onClick={() => navigate('/tasks')}
-                  >
-                    <ClipboardList className="mr-2 h-4 w-4" />
-                    View All Tasks Report
-                  </Button>
-                </div>
               </div>
             </div>
           </div>

@@ -8,6 +8,9 @@ import { UserProvider } from "@/contexts/UserContext";
 import Index from "./pages/Index";
 import CustomerView from "./pages/CustomerView";
 import TaskReportPage from "./pages/TaskReportPage";
+import CustomerStatusReport from "./pages/reports/CustomerStatusReport";
+import TeamPerformanceReport from "./pages/reports/TeamPerformanceReport";
+import DepartmentOverviewReport from "./pages/reports/DepartmentOverviewReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +26,12 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/customer/:customerId" element={<CustomerView />} />
             <Route path="/tasks" element={<TaskReportPage />} />
+            
+            {/* Report Routes */}
+            <Route path="/reports/customer-status" element={<CustomerStatusReport />} />
+            <Route path="/reports/team-performance" element={<TeamPerformanceReport />} />
+            <Route path="/reports/department-overview" element={<DepartmentOverviewReport />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -2,13 +2,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useUser, UserRole } from '@/contexts/UserContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { 
   BarChart3, FileText, Users, TrendingUp, 
-  DollarSign, Clock, AlertCircle, CheckCircle, Heart
+  DollarSign, Clock, AlertCircle, CheckCircle, Heart, ChevronRight
 } from 'lucide-react';
 
-interface ReportCardProps {
+interface ReportLink {
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -16,33 +15,9 @@ interface ReportCardProps {
   color?: string;
 }
 
-const ReportCard = ({ title, description, icon, path, color = "bg-primary/10 text-primary" }: ReportCardProps) => {
-  const navigate = useNavigate();
-  
-  return (
-    <Card className="hover-scale">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-md font-medium">{title}</CardTitle>
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${color}`}>
-          {icon}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">{description}</p>
-        <Button 
-          onClick={() => navigate(path)} 
-          variant="outline" 
-          className="w-full"
-        >
-          View Report
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-const ReportsSection = () => {
+const ReportSection = () => {
   const { role } = useUser();
+  const navigate = useNavigate();
   
   const rmReports = [
     {
@@ -150,26 +125,44 @@ const ReportsSection = () => {
     }
   };
   
+  const reports = getReportsByRole(role);
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center mb-2">
         <FileText className="mr-2 h-6 w-6" />
         <h2 className="text-2xl font-bold">Reports Dashboard</h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {getReportsByRole(role).map((report, index) => (
-          <ReportCard
-            key={index}
-            title={report.title}
-            description={report.description}
-            icon={report.icon}
-            path={report.path}
-            color={report.color}
-          />
-        ))}
-      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Reports</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <ul className="divide-y">
+            {reports.map((report, index) => (
+              <li 
+                key={index}
+                className="flex items-center justify-between p-4 hover:bg-muted cursor-pointer"
+                onClick={() => navigate(report.path)}
+              >
+                <div className="flex items-center">
+                  <div className={`mr-4 w-10 h-10 rounded-lg flex items-center justify-center ${report.color}`}>
+                    {report.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{report.title}</h3>
+                    <p className="text-sm text-muted-foreground">{report.description}</p>
+                  </div>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default ReportsSection;
+export default ReportSection;
